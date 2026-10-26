@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "current_feature": "project-init",
+  "features": [
+    {
+      "id": "project-init",
+      "title": "Project initialization with FastAPI + React skeleton",
+      "status": "done",
+      "acceptance": [
+        "FastAPI backend runs on port 8000",
+        "React frontend runs on port 3000",
+        "Frontend can call backend health endpoint",
+        "Both services start via single command"
+      ],
+      "implementation": [
+        "backend/app/main.py",
+        "backend/requirements.txt",
+        "backend/Dockerfile",
+        "frontend/src/App.jsx",
+        "frontend/package.json",
+        "frontend/Dockerfile",
+        "docker-compose.yml"
+      ],
+      "tests": []
+    },
+    {
+      "id": "code-execution",
+      "title": "Code execution sandbox API",
+      "status": "planned",
+      "acceptance": [
+        "POST /api/execute accepts code and language",
+        "Returns stdout, stderr, exit code",
+        "Supports Python and JavaScript at minimum",
+        "Execution timeout enforced"
+      ],
+      "implementation": [],
+      "tests": []
+    },
+    {
+      "id": "file-manager",
+      "title": "File manager for user workspaces",
+      "status": "planned",
+      "acceptance": [
+        "List, read, write, delete files in workspace",
+        "Tree view in frontend",
+        "Persists across sessions"
+      ],
+      "implementation": [],
+      "tests": []
+    },
+    {
+      "id": "ai-assistant",
+      "title": "AI coding assistant integration",
+      "status": "planned",
+      "acceptance": [
+        "Chat interface in frontend",
+        "Backend proxies to LLM API",
+        "Context includes open files"
+      ],
+      "implementation": [],
+      "tests": []
+    }
+  ]
+}
