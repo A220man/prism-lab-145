@@ -26,14 +26,17 @@
     {
       "id": "code-execution",
       "title": "Code execution sandbox API",
-      "status": "planned",
+      "status": "done",
       "acceptance": [
         "POST /api/execute accepts code and language",
         "Returns stdout, stderr, exit code",
         "Supports Python and JavaScript at minimum",
         "Execution timeout enforced"
       ],
-      "implementation": [],
+      "implementation": [
+        "backend/app/main.py",
+        "backend/requirements.txt"
+      ],
       "tests": []
     },
     {
