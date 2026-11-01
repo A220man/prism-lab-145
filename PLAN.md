@@ -22,13 +22,15 @@ Implementation: `backend/app/main.py`, `backend/requirements.txt`, `backend/Dock
 
 ### code-execution — Code execution sandbox API
 
-Status: planned
+Status: done
 
 Acceptance:
 - POST /api/execute accepts code and language
 - Returns stdout, stderr, exit code
 - Supports Python and JavaScript at minimum
 - Execution timeout enforced
+
+Implementation: `backend/app/main.py`, `backend/requirements.txt`
 
 ### file-manager — File manager for user workspaces
 
