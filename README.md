@@ -61,10 +61,10 @@ prism-lab-145/
 
 ## Features (Roadmap)
 
-1. ✅ Project initialization (FastAPI + React)
-2. 🔄 Code execution sandbox API
-3. 🔄 File manager for user workspaces
-4. 🔄 AI coding assistant integration
+- ✅ Project initialization (FastAPI + React)
+- ✅ Code execution sandbox API
+- 🔄 File manager for user workspaces
+- 🔄 AI coding assistant integration
 
 ## License
 

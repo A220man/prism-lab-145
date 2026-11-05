@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "current_feature": "project-init",
+  "current_feature": "file-manager",
   "features": [
     {
       "id": "project-init",
