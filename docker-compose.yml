@@ -7,6 +7,7 @@ services:
       - "8000:8000"
     volumes:
       - ./backend:/app
+      - workspace-data:/workspace
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
   frontend:
@@ -21,3 +22,6 @@ services:
     command: npm run dev -- --host 0.0.0.0
     depends_on:
       - backend
+
+volumes:
+  workspace-data:
