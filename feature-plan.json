@@ -42,13 +42,18 @@
     {
       "id": "file-manager",
       "title": "File manager for user workspaces",
-      "status": "planned",
+      "status": "done",
       "acceptance": [
         "List, read, write, delete files in workspace",
         "Tree view in frontend",
         "Persists across sessions"
       ],
-      "implementation": [],
+      "implementation": [
+        "backend/app/main.py",
+        "frontend/src/FileManager.jsx",
+        "frontend/src/App.jsx",
+        "docker-compose.yml"
+      ],
       "tests": []
     },
     {

@@ -46,7 +46,8 @@ prism-lab-145/
 │   └── Dockerfile
 ├── frontend/
 │   ├── src/
-│   │   └── App.jsx          # React frontend
+│   │   ├── App.jsx          # React frontend
+│   │   └── FileManager.jsx  # File manager component
 │   ├── package.json
 │   └── Dockerfile
 ├── docker-compose.yml
@@ -58,12 +59,18 @@ prism-lab-145/
 
 - `GET /api/health` - Health check
 - `GET /api/version` - Version info
+- `POST /api/execute` - Execute code (Python/JavaScript)
+- `GET /api/files` - List workspace files (tree)
+- `GET /api/files/content?path=<path>` - Read file content
+- `POST /api/files/content` - Write file content
+- `DELETE /api/files` - Delete file or directory
+- `POST /api/files/mkdir` - Create directory
 
 ## Features (Roadmap)
 
 - ✅ Project initialization (FastAPI + React)
 - ✅ Code execution sandbox API
-- 🔄 File manager for user workspaces
+- ✅ File manager for user workspaces
 - 🔄 AI coding assistant integration
 
 ## License

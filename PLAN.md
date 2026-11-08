@@ -34,12 +34,14 @@ Implementation: `backend/app/main.py`, `backend/requirements.txt`
 
 ### file-manager — File manager for user workspaces
 
-Status: planned
+Status: done
 
 Acceptance:
 - List, read, write, delete files in workspace
 - Tree view in frontend
 - Persists across sessions
+
+Implementation: `backend/app/main.py`, `frontend/src/FileManager.jsx`, `frontend/src/App.jsx`, `docker-compose.yml`
 
 ### ai-assistant — AI coding assistant integration
 
