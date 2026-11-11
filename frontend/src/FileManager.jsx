@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 
 const API_BASE = 'http://localhost:8000/api'
 
-function FileTree({ node, onSelect, onCreateFile, onCreateDir, onDelete, expandedPaths, setExpandedPaths, selectedPath }) {
+function FileTree({ node, onSelect, onCreateFile, onCreateDir, onDelete, onRename, expandedPaths, setExpandedPaths, selectedPath }) {
   const isExpanded = expandedPaths.has(node.path)
   const hasChildren = node.is_dir && node.children && node.children.length > 0
   const isSelected = selectedPath === node.path
@@ -44,6 +44,11 @@ function FileTree({ node, onSelect, onCreateFile, onCreateDir, onDelete, expande
   const handleDelete = (e) => {
     e.stopPropagation()
     onDelete(node.path, node.is_dir)
+  }
+
+  const handleRename = (e) => {
+    e.stopPropagation()
+    onRename(node.path, node.name, node.is_dir)
   }
 
   return (
@@ -111,6 +116,21 @@ function FileTree({ node, onSelect, onCreateFile, onCreateDir, onDelete, expande
         >
           ×
         </button>
+        <button
+          onClick={handleRename}
+          title="Rename"
+          style={{
+            padding: '0 4px',
+            fontSize: '12px',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            color: '#1976d2',
+            opacity: 0.7,
+          }}
+        >
+          ✎
+        </button>
       </div>
       {isExpanded && hasChildren && (
         <div style={{ marginLeft: '20px', borderLeft: '1px solid #e0e0e0', paddingLeft: '8px' }}>
@@ -122,6 +142,7 @@ function FileTree({ node, onSelect, onCreateFile, onCreateDir, onDelete, expande
               onCreateFile={onCreateFile}
               onCreateDir={onCreateDir}
               onDelete={onDelete}
+              onRename={onRename}
               expandedPaths={expandedPaths}
               setExpandedPaths={setExpandedPaths}
               selectedPath={selectedPath}
@@ -259,6 +280,8 @@ export default function FileManager() {
   const [creatingPath, setCreatingPath] = useState(null)
   const [createType, setCreateType] = useState(null) // 'file' or 'dir'
   const [newName, setNewName] = useState('')
+  const [renamingPath, setRenamingPath] = useState(null)
+  const [renameNewName, setRenameNewName] = useState('')
 
   const fetchTree = useCallback(async () => {
     setLoading(true)
@@ -321,6 +344,41 @@ export default function FileManager() {
     } catch (err) {
       alert('Failed to delete: ' + err.message)
     }
+  }
+
+  const handleRename = (path, currentName, isDir) => {
+    setRenamingPath(path)
+    setRenameNewName(currentName)
+  }
+
+  const confirmRename = async () => {
+    if (!renamingPath || !renameNewName.trim()) return
+    const oldPath = renamingPath
+    const newName = renameNewName.trim()
+    const parentPath = oldPath.substring(0, oldPath.lastIndexOf('/'))
+    const newPath = parentPath ? `${parentPath}/${newName}` : newName
+    try {
+      const res = await fetch(`${API_BASE}/files/rename`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ old_path: oldPath, new_path: newPath }),
+      })
+      if (!res.ok) throw new Error(await res.text())
+      fetchTree()
+      if (selectedFile?.path === oldPath) {
+        setSelectedFile(null)
+        setFileContent('')
+      }
+      setRenamingPath(null)
+      setRenameNewName('')
+    } catch (err) {
+      alert('Failed to rename: ' + err.message)
+    }
+  }
+
+  const cancelRename = () => {
+    setRenamingPath(null)
+    setRenameNewName('')
   }
 
   const confirmCreate = async () => {
@@ -412,6 +470,7 @@ export default function FileManager() {
             onCreateFile={handleCreateFile}
             onCreateDir={handleCreateDir}
             onDelete={handleDelete}
+            onRename={handleRename}
             expandedPaths={expandedPaths}
             setExpandedPaths={setExpandedPaths}
             selectedPath={selectedFile?.path}
@@ -468,6 +527,28 @@ export default function FileManager() {
             />
             <button onClick={confirmCreate} style={{ padding: '6px 12px', background: '#1976d2', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Create</button>
             <button onClick={cancelCreate} style={{ padding: '6px 12px', background: 'none', border: '1px solid #ccc', borderRadius: '4px', cursor: 'pointer' }}>Cancel</button>
+          </div>
+        )}
+        {renamingPath && (
+          <div style={{
+            padding: '12px',
+            background: '#e3f2fd',
+            borderBottom: '1px solid #bbdefb',
+            display: 'flex',
+            gap: '8px',
+            alignItems: 'center',
+          }}>
+            <input
+              type="text"
+              value={renameNewName}
+              onChange={(e) => setRenameNewName(e.target.value)}
+              placeholder="new-name"
+              style={{ flex: 1, padding: '6px', borderRadius: '4px', border: '1px solid #ccc' }}
+              autoFocus
+              onKeyDown={(e) => e.key === 'Enter' && confirmRename()}
+            />
+            <button onClick={confirmRename} style={{ padding: '6px 12px', background: '#1976d2', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Rename</button>
+            <button onClick={cancelRename} style={{ padding: '6px 12px', background: 'none', border: '1px solid #ccc', borderRadius: '4px', cursor: 'pointer' }}>Cancel</button>
           </div>
         )}
         {selectedFile ? (

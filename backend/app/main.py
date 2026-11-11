@@ -54,6 +54,26 @@ class FileDeleteRequest(BaseModel):
     path: str
 
 
+class FileRenameRequest(BaseModel):
+    old_path: str
+    new_path: str
+
+
+
+@app.post("/api/files/rename")
+async def rename_file(request: FileRenameRequest):
+    """Rename or move file or directory."""
+    old_target = validate_path(request.old_path)
+    new_target = validate_path(request.new_path)
+    if not old_target.exists():
+        raise HTTPException(status_code=404, detail="Source path not found")
+    if new_target.exists():
+        raise HTTPException(status_code=400, detail="Destination path already exists")
+    new_target.parent.mkdir(parents=True, exist_ok=True)
+    old_target.rename(new_target)
+    return {"success": True, "old_path": request.old_path, "new_path": request.new_path}
+
+
 SUPPORTED_LANGUAGES = {
     "python": {"command": ["python3", "-c"], "extension": ".py"},
     "javascript": {"command": ["node", "-e"], "extension": ".js"},
