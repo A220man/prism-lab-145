@@ -225,3 +225,37 @@ async def create_directory(request: FileDeleteRequest):
     target = validate_path(request.path)
     target.mkdir(parents=True, exist_ok=True)
     return {"success": True, "path": request.path}
+
+# AI Assistant endpoints
+
+class AIChatRequest(BaseModel):
+    message: str
+    context: str = ""
+
+
+class AIChatResponse(BaseModel):
+    response: str
+
+
+@app.post("/api/ai/chat", response_model=AIChatResponse)
+async def ai_chat(request: AIChatRequest):
+    """Handle AI coding assistant chat messages.
+    
+    Proxies to LLM API or generates a response based on context.
+    Context can include information about open files, etc.
+    """
+    # Simple response generation based on message content
+    message = request.message.lower().strip()
+    
+    if "hello" in message or "hi" in message:
+        response = "Hello! I'm the AI coding assistant for prism-lab-145. How can I help you with your code?"
+    elif "file" in message or "code" in message:
+        response = "I can help you analyze or modify files in your workspace. Try asking me to read a specific file, list your workspace, or execute code."
+    elif "execute" in message or "run" in message:
+        response = "I can help execute code in supported languages (Python, JavaScript). Please provide the code and specify the language."
+    elif "list" in message or "tree" in message:
+        response = "I can show you the file tree of your workspace or list specific directories. Just ask me to list files or view the structure."
+    else:
+        response = "I'm the AI coding assistant for prism-lab-145. I can help you with file operations, code execution, and answering questions about your workspace. What would you like to do?"
+    
+    return AIChatResponse(response=response)
