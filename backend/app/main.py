@@ -243,19 +243,56 @@ async def ai_chat(request: AIChatRequest):
     
     Proxies to LLM API or generates a response based on context.
     Context can include information about open files, etc.
+    The context parameter can contain file tree or other workspace state
+    to inform the assistant's response.
     """
-    # Simple response generation based on message content
     message = request.message.lower().strip()
     
+    # Build response context from provided context or workspace state
+    context_summary = ""
+    if request.context:
+        context_summary = request.context
+    else:
+        # Auto-detect: try to get workspace file tree
+        try:
+            import subprocess
+            result = subprocess.run(
+                ["python3", "-c", 
+                 "import json, sys; from pathlib import Path; "
+                 "w = Path('/workspace'); "
+                 "if w.exists(): "
+                 "    items = []; "
+                 "    for p in sorted(w.iterdir(), key=lambda x: (not x.is_dir(), x.name.lower())): "
+                 "        if not p.name.startswith('.'): "
+                 "            items.append((p.name, 'dir' if p.is_dir() else 'file')); "
+                 "    print(json.dumps(items))"],
+                capture_output=True, text=True, timeout=5
+            )
+            if result.returncode == 0 and result.stdout.strip():
+                items = json.loads(result.stdout)
+                context_summary = ", ".join(f"{t[0]} ({t[1]})" for t in items[:20])
+        except Exception:
+            context_summary = "workspace files"
+    
+    # Simple response generation based on message content
     if "hello" in message or "hi" in message:
         response = "Hello! I'm the AI coding assistant for prism-lab-145. How can I help you with your code?"
     elif "file" in message or "code" in message:
-        response = "I can help you analyze or modify files in your workspace. Try asking me to read a specific file, list your workspace, or execute code."
+        if context_summary:
+            response = f"I can help you analyze or modify files in your workspace ({context_summary}). Try asking me to read a specific file, list your workspace, or execute code."
+        else:
+            response = "I can help you analyze or modify files in your workspace. Try asking me to read a specific file, list your workspace, or execute code."
     elif "execute" in message or "run" in message:
         response = "I can help execute code in supported languages (Python, JavaScript). Please provide the code and specify the language."
     elif "list" in message or "tree" in message:
-        response = "I can show you the file tree of your workspace or list specific directories. Just ask me to list files or view the structure."
+        if context_summary:
+            response = f"I can show you the file tree of your workspace ({context_summary}). Just ask me to list files or view the structure."
+        else:
+            response = "I can show you the file tree of your workspace or list specific directories. Just ask me to list files or view the structure."
     else:
-        response = "I'm the AI coding assistant for prism-lab-145. I can help you with file operations, code execution, and answering questions about your workspace. What would you like to do?"
+        if context_summary:
+            response = f"I'm the AI coding assistant for prism-lab-145. I can help you with file operations, code execution, and answering questions about your workspace ({context_summary}). What would you like to do?"
+        else:
+            response = "I'm the AI coding assistant for prism-lab-145. I can help you with file operations, code execution, and answering questions about your workspace. What would you like to do?"
     
     return AIChatResponse(response=response)
